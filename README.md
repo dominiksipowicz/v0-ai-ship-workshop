@@ -85,31 +85,48 @@ Test the application with "iPhone" in the brand input field.
 - [ ] Ensure answerData matches `VisibilityAnswer` type from `upstash.ts`
 - [ ] Test all three API routes with brand name input
 
-### Phase 3: Sync and Deploy
+### Phase 3: CLI Agent Flow (Streach Goal)
+
+- [ ] Install `@next/env` package for environment variable loading
+- [ ] Create `lib/envConfig.ts` with `loadEnvConfig` from `@next/env`
+- [ ] Create `scripts/full-agent-flow.ts` to import `envConfig` at the top
+- [ ] Use types from `lib/upstash.ts` and `lib/constants.ts`
+- [ ] Create `checkVisibility` function with `Promise.allSettled` for parallel execution
+- [ ] Test CLI script locally with `pnpm full-agent-flow iphone run222`
+- [ ] Verify all 27 checks run in parallel
+- [ ] Confirm results are stored in Redis with the correct runId
+
+### Phase 4: Vercel Sandbox Integration (Streach Goal)
+
+- [ ] Install `@vercel/sandbox`, `ms`, and `@types/ms` packages
+- [ ] Create `app/api/full-flow-agent/route.ts` endpoint
+- [ ] Configure Sandbox to clone from GitHub repository
+- [ ] Set Sandbox resources to 4 vCPUs and 10 minute timeout
+- [ ] Pass all required environment variables to `runCommand` (not Sandbox.create)
+- [ ] Run `pnpm install` in Sandbox with environment variables
+- [ ] Execute `pnpm full-agent-flow <brand> <runId>` in detached mode
+- [ ] Do not use `sandbox.stop()` to keep sandbox running until completion
+- [ ] Update `app/page.tsx` to call `/api/full-flow-agent` instead of 3 separate routes
+- [ ] Remove unused `MODELS` import from `page.tsx`
+- [ ] Update button text to indicate Sandbox execution
+- [ ] Test locally with `vercel env pull` for OIDC token
+- [ ] Test endpoint with `curl -X POST http://localhost:3000/api/full-flow-agent -H "Content-Type: application/json" -d '{"brand": "iphone"}'`
+- [ ] Verify frontend polling displays results in real-time
+
+### Phase 5: Sync and Deploy
 
 - [ ] Push changes to GitHub main branch
 - [ ] Sync v0 with GitHub to pull latest changes
 - [ ] Verify deployment on Vercel production
+- [ ] Test production Sandbox endpoint
+- [ ] Monitor sandboxes in Vercel Dashboard Observability tab
 - [ ] Test production application end-to-end
 
 ## Stretch Goals
 
-Once you've completed Phase 1-3, try these advanced challenges:
+Once you've completed Phase 1-5, try these advanced challenges:
 
-### Advanced: Vercel Sandbox Integration
-
-- [ ] Install Vercel Sandbox SDK and dependencies
-- [ ] Create `POST /api/full-flow-agent` endpoint using Vercel Sandbox
-- [ ] Configure sandbox to clone GitHub repository
-- [ ] Pass all required environment variables to sandbox
-- [ ] Run `pnpm install` in sandbox
-- [ ] Execute `pnpm full-agent-flow <brand> <runId>` in sandbox
-- [ ] Test locally with `vercel env pull` for OIDC token
-- [ ] Deploy to Vercel and test in production
-- [ ] Monitor sandboxes in Vercel Dashboard Observability tab
-- [ ] Optional: Update frontend to use Sandbox endpoint instead of individual API routes
-
-### Advanced: UI Enhancements
+### UI enhancements
 
 - [ ] Integrate AI Elements into results display
 - [ ] Use v0 to generate chart components for visualization
