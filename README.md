@@ -85,6 +85,8 @@ Test the application with "iPhone" in the brand input field.
 - [ ] Ensure answerData matches `VisibilityAnswer` type from `upstash.ts`
 - [ ] Test all three API routes with brand name input
 
+## Stretch Goals
+
 ### Phase 3: CLI Agent Flow (Streach Goal)
 
 - [ ] Install `@next/env` package for environment variable loading
@@ -121,8 +123,6 @@ Test the application with "iPhone" in the brand input field.
 - [ ] Test production Sandbox endpoint
 - [ ] Monitor sandboxes in Vercel Dashboard Observability tab
 - [ ] Test production application end-to-end
-
-## Stretch Goals
 
 Once you've completed Phase 1-5, try these advanced challenges:
 
