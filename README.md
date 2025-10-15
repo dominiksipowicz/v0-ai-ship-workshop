@@ -98,9 +98,16 @@ Once you've completed Phase 1-3, try these advanced challenges:
 
 ### Advanced: Vercel Sandbox Integration
 
-- [ ] Consolidate all 3 API routes into single Vercel Sandbox execution
-- [ ] Update frontend to call single Sandbox endpoint
-- [ ] Test end-to-end workflow with Sandbox
+- [ ] Install Vercel Sandbox SDK and dependencies
+- [ ] Create `POST /api/full-flow-agent` endpoint using Vercel Sandbox
+- [ ] Configure sandbox to clone GitHub repository
+- [ ] Pass all required environment variables to sandbox
+- [ ] Run `pnpm install` in sandbox
+- [ ] Execute `pnpm full-agent-flow <brand> <runId>` in sandbox
+- [ ] Test locally with `vercel env pull` for OIDC token
+- [ ] Deploy to Vercel and test in production
+- [ ] Monitor sandboxes in Vercel Dashboard Observability tab
+- [ ] Optional: Update frontend to use Sandbox endpoint instead of individual API routes
 
 ### Advanced: UI Enhancements
 
@@ -130,9 +137,10 @@ Once you've completed Phase 1-3, try these advanced challenges:
 
 - [AI SDK v5 Documentation](https://sdk.vercel.ai/docs)
 - [Agent Building Guide](https://ai-sdk.dev/docs/agents/building-agents)
+- [Vercel Sandbox Documentation](https://vercel.com/docs/vercel-sandbox)
 - [v0 Documentation](https://v0.dev/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
-- [Vercel Workflows](https://vercel.com/docs/workflow)
+- [Next.js Environment Variables](https://nextjs.org/docs/app/guides/environment-variables)
 
 ---
 
