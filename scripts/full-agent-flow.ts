@@ -314,48 +314,57 @@ async function main() {
       contextData.context
     );
 
-    // Step 3: Check visibility across all models
+    // Step 3: Check visibility across all models (in parallel)
     console.log("\n🔍 Step 3: Checking visibility across models...");
     const totalChecks = questions.length * MODELS.length * 3;
-    let completedChecks = 0;
-    let successfulChecks = 0;
-    let mentionedCount = 0;
-
     console.log(`   Total checks to perform: ${totalChecks}`);
+    console.log(`   Running all checks in parallel...`);
 
-    for (const question of questions) {
-      console.log(`\n   Question ${question.id}:`);
-      for (const model of MODELS) {
-        console.log(`      ${model.name}:`);
-        for (let run = 1; run <= 3; run++) {
-          const result = await checkVisibility(
-            runId,
-            question.id,
-            question.question,
-            model.id,
-            run,
-            brand
+    // Build array of all checks to run in parallel
+    const allChecks = questions.flatMap((question) =>
+      MODELS.flatMap((model) =>
+        Array.from({ length: 3 }, (_, i) => ({
+          question,
+          model,
+          run: i + 1,
+        }))
+      )
+    );
+
+    // Run all checks in parallel using Promise.allSettled
+    // This ensures all checks complete even if some fail
+    const settledResults = await Promise.allSettled(
+      allChecks.map(({ question, model, run }) =>
+        checkVisibility(
+          runId,
+          question.id,
+          question.question,
+          model.id,
+          run,
+          brand
+        ).then((result) => {
+          // Log individual completion
+          const status = result.failed
+            ? `⚠️  Failed - ${result.error}`
+            : result.mentioned
+            ? `✅ Mentioned (pos: ${result.position ?? "only"})`
+            : `❌ Not mentioned`;
+          console.log(
+            `   [${question.id}] ${model.name} run ${run}: ${status}`
           );
+          return result;
+        })
+      )
+    );
 
-          completedChecks++;
-          if (!result.failed) {
-            successfulChecks++;
-            if (result.mentioned) {
-              mentionedCount++;
-              console.log(
-                `         Run ${run}: ✅ Mentioned (position: ${
-                  result.position ?? "only"
-                })`
-              );
-            } else {
-              console.log(`         Run ${run}: ❌ Not mentioned`);
-            }
-          } else {
-            console.log(`         Run ${run}: ⚠️  Failed - ${result.error}`);
-          }
-        }
-      }
-    }
+    // Extract successful results from settled promises
+    const results = settledResults
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
+
+    // Calculate summary
+    const successfulChecks = results.filter((r) => !r.failed);
+    const mentionedCount = successfulChecks.filter((r) => r.mentioned).length;
 
     // Summary
     console.log("\n" + "=".repeat(60));
@@ -365,13 +374,13 @@ async function main() {
     console.log(`   Brand: ${brand}`);
     console.log(`   Run ID: ${runId}`);
     console.log(`   Questions: ${questions.length}`);
-    console.log(`   Total checks: ${completedChecks}/${totalChecks}`);
-    console.log(`   Successful: ${successfulChecks}`);
-    console.log(`   Failed: ${completedChecks - successfulChecks}`);
+    console.log(`   Total checks: ${results.length}/${totalChecks}`);
+    console.log(`   Successful: ${successfulChecks.length}`);
+    console.log(`   Failed: ${results.length - successfulChecks.length}`);
     console.log(`   Brand mentions: ${mentionedCount}`);
     console.log(
       `   Visibility rate: ${(
-        (mentionedCount / successfulChecks) *
+        (mentionedCount / successfulChecks.length) *
         100
       ).toFixed(1)}%`
     );
