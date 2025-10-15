@@ -27,25 +27,26 @@ This is a hands-on workshop template for AI Ship 2025 that teaches you how to re
 
 Before starting the workshop, ensure you have:
 
-- ✅ **React** knowledge
-- ✅ **Next.js** experience
-- ✅ **v0 Account** - [Sign up at v0.dev](https://v0.dev)
-- ✅ **Vercel Account** - [Sign up at vercel.com](https://vercel.com)
-- ✅ **Vercel AI Gateway credits** - will be provided by Vercel for you to use durign the workshop
-- ✅ **GitHub Account** - [Sign up at github.com](https://github.com)
+- ✅ React knowledge
+- ✅ Next.js experience
+- ✅ v0 Account
+- ✅ Vercel Account
+- ✅ Vercel AI Gateway API key
+- ✅ GitHub Account
+- ✅ Node.js and pnpm installed
 
 ## Development (after you have cloned the template!!)
 
 Run the development server:
 
-\`\`\`bash
+```bash
 
 pnpm install
 vercel link
 vercel env pull
 pnpm dev
 
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000) to see your application.
 
@@ -53,128 +54,72 @@ Test the application with "iPhone" in the brand input field.
 
 ## Workshop Tasks
 
-### 1. Initial Setup
+### Phase 1: Initial Setup
 
-#### Task 1.1: Clone Template from v0
+- [ ] Clone workshop template from v0.dev into your personal workspace
+- [ ] Connect your v0 project to GitHub and create new repository
+- [ ] Deploy project from v0 to Vercel and verify deployment
+- [ ] Clone GitHub repository to your local machine
+- [ ] Run `pnpm install` to install dependencies
+- [ ] Run `vercel link` to link your local project to vercel project
+- [ ] Set up environment variables with `vercel env pull`
+- [ ] Test the application locally with `pnpm dev`
 
-- Navigate to [v0.dev](https://v0.app/templates/ai-ship-workshop-tyVvKQthD7X)
-- [Find this workshop template](https://v0.app/templates/ai-ship-workshop-tyVvKQthD7X)
-- Clone it into your personal v0 workspace
+### Phase 2: Refactor to AI SDK v5
 
-#### Task 1.2: Connect to GitHub
+- [ ] Import `Experimental_Agent as Agent` and `Output` from `ai` package
+- [ ] Refactor `create-brand-context` API route to use Agent class with `experimental_output: Output.object()`
+- [ ] Add system prompt to create-brand-context Agent
+- [ ] Create Zod schema for brand context structured output
+- [ ] Ensure contextData matches `BrandContext` type from `upstash.ts`
+- [ ] Refactor `generate-questions` API route to use Agent class with structured output
+- [ ] Add system prompt to generate-questions Agent with brand name restrictions
+- [ ] Create validation tool that checks for brand mentions in questions
+- [ ] Configure Agent with `stopWhen: stepCountIs(3)` for max 3 steps
+- [ ] Update Agent system prompt to instruct calling validateQuestions tool
+- [ ] Remove manual validation check and trust Agent tool validation
+- [ ] Ensure questions match `Question[]` type from `upstash.ts`
+- [ ] Refactor `check-visibility` API route to use Agent class
+- [ ] Add system prompt to check-visibility Agent for brand detection
+- [ ] Create Zod schema for brand detection with `isVisible` and `position` fields
+- [ ] Ensure answerData matches `VisibilityAnswer` type from `upstash.ts`
+- [ ] Test all three API routes with brand name input
 
-- In v0, connect your project to GitHub
-- Authorize v0 to access your GitHub account
-- Create a new repository for this project
+### Phase 3: Sync and Deploy
 
-#### Task 1.3: Deploy to Production
-
-- Deploy your project from v0 to Vercel
-- Verify the deployment is successful
-- Note your production URL
-
-#### Task 1.4: Clone Locally
-
-- Clone the GitHub repository to your local machine
-  \`\`\`bash
-  git clone <your-repo-url>
-  cd v0-ai-ship-workshop
-  pnpm install
-  \`\`\`
-
-### 2. Refactor to AI SDK v5 Features
-
-The main focus of this workshop is modernizing the codebase with AI SDK v5 features:
-
-#### Task 2.1: Refactor from `generateText` to `generateObject`
-
-- Update API routes to use structured outputs
-- Implement proper TypeScript types for responses
-- Reference: [Structured Output Docs](https://ai-sdk.dev/docs/agents/building-agents#structured-output)
-
-#### Task 2.2: Implement System Prompts
-
-- Add system prompts to guide AI behavior
-- Ensure consistent AI responses across endpoints
-
-#### Task 2.3: Use Agent Class for Generate Questions
-
-- Refactor `generate-questions` route to use the Agent class
-- **Requirement**: Verify there is no brand mentioned in the output
-- Implement validation logic
-
-#### Task 2.4: Use Agent Class for Check Visibility
-
-- Convert `check-visibility` route to use Agent class
-- Transform into a "detect results" pattern
-- Implement proper error handling
-
-#### Task 2.5: Implement Prepare Step
-
-- Use Prepare Step for changing models dynamically
-- Apply for brand mention detection
-- Apply for detecting results
-- Optimize model selection based on task
-
-#### Task 2.6: Push Changes to GitHub
-
-\`\`\`bash
-git add .
-git commit -m "Refactor to AI SDK v5 with Agent class and modern patterns"
-git push origin main
-\`\`\`
-
-### 3. Sync and Enhance
-
-#### Task 3.1: Sync v0 with GitHub
-
-- Pull latest changes into v0
-- Verify synchronization is working
-
-#### Task 3.2: Add Payment Option
-
-- Add payment integration to make this a full SaaS example
-- Use v0 to generate payment UI components
-- Implement billing logic
-
-#### Task 3.3: Final Sync
-
-- Commit payment features
-- Push to GitHub
-- Verify v0 sync
+- [ ] Push changes to GitHub main branch
+- [ ] Sync v0 with GitHub to pull latest changes
+- [ ] Verify deployment on Vercel production
+- [ ] Test production application end-to-end
 
 ## Stretch Goals
 
-Once you've completed the main tasks, try these advanced challenges:
+Once you've completed Phase 1-3, try these advanced challenges:
 
-### 🚀 Advanced Features
+### Advanced: Vercel Sandbox Integration
 
-1. **Refactor to Use Vercel Sandbox**
+- [ ] Consolidate all 3 API routes into single Vercel Sandbox execution
+- [ ] Update frontend to call single Sandbox endpoint
+- [ ] Test end-to-end workflow with Sandbox
 
-   - refactor all 3 API Routes (create-brand-context, generate-questions, check-visibility) into one initial call that will execute Vercel Sandbox
+### Advanced: UI Enhancements
 
-2. **Add AI Elements**
+- [ ] Integrate AI Elements into results display
+- [ ] Use v0 to generate chart components for visualization
+- [ ] Add interactive data visualizations to results
 
-   - Integrate AI Elements library
-   - Enhance "view chats" functionality with AI Elements
-   - Enhance UI with pre-built AI components
+### Advanced: Security & Performance
 
-3. **Implement Security: BotID**
+- [ ] Implement BotID for bot detection and prevention
+- [ ] Add rate limiting middleware to API routes
+- [ ] Configure Vercel Firewall or Upstash rate limiting
+- [ ] Monitor and log API usage patterns
 
-   - Add bot detection and prevention
-   - Implement BotID for request verification
-   - Protect against automated abuse
+### Advanced: SaaS Features
 
-4. **Add Rate Limiting for API Routes**
-
-   - Implement rate limiting middleware
-   - Protect API endpoints from abuse
-   - Use Vercel Edge Config or Upstash or Vercel Firewall
-
-5. **Add Charts to Final Report**
-   - Use v0 to generate chart components
-   - Visualize data in the final report
-   - Add interactive data visualizations
+- [ ] Add Stripe for payment processing
+- [ ] Claim Stripe Sandbox account
+- [ ] test Stripe payment processing in Stripe dashboard
 
 ## Troubleshooting
 
