@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "../lib/envConfig";
 import {
   Experimental_Agent as Agent,
   Output,
@@ -7,14 +8,9 @@ import {
   generateText,
 } from "ai";
 import { z } from "zod";
-import * as dotenv from "dotenv";
-import * as path from "path";
 import { Redis } from "@upstash/redis";
 import type { BrandContext, Question, VisibilityAnswer } from "../lib/upstash";
 import { MODELS } from "../lib/constants";
-
-// Load environment variables from .env.local file
-dotenv.config({ path: path.join(process.cwd(), ".env.local") });
 
 // Initialize Redis client with proper environment variable handling
 const redis = new Redis({
