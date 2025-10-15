@@ -1,47 +1,67 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { generateText } from "ai"
-import { redis } from "@/lib/upstash"
+import { type NextRequest, NextResponse } from "next/server";
+import { Experimental_Agent as Agent, Output } from "ai";
+import { z } from "zod";
+import { redis, type BrandContext } from "@/lib/upstash";
+
+// Schema for brand context
+const brandContextSchema = z.object({
+  description: z.string().describe("What the brand/product is"),
+  keyFeatures: z.array(z.string()).describe("Key features and offerings"),
+  targetAudience: z.string().describe("Target audience"),
+  industry: z.string().describe("Industry and category"),
+  valuePropositions: z.array(z.string()).describe("Unique value propositions"),
+  comprehensiveSummary: z
+    .string()
+    .describe("A comprehensive paragraph summary for generating questions"),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const { runId, brand } = await request.json()
+    const { runId, brand } = await request.json();
 
     if (!runId || !brand) {
-      return NextResponse.json({ error: "Missing runId or brand" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing runId or brand" },
+        { status: 400 }
+      );
     }
 
-    // Generate master context using AI
-    const { text } = await generateText({
+    // Create Agent for brand context generation
+    const brandContextAgent = new Agent({
       model: "openai/gpt-4o-mini",
-      prompt: `You are an expert at creating comprehensive brand context for AI visibility testing.
+      system:
+        "You are an expert at creating comprehensive brand context for AI visibility testing. Analyze brands and products to provide detailed, structured information.",
+      experimental_output: Output.object({
+        schema: brandContextSchema,
+      }),
+    });
 
-Given the brand/product: "${brand}"
+    // Generate master context using AI with structured output
+    const { experimental_output: brandContext } =
+      await brandContextAgent.generate({
+        prompt: `Analyze this brand/product: "${brand}"
+      
+Provide comprehensive information that will be used to generate natural questions users might ask AI assistants.`,
+      });
 
-Create a detailed master context that includes:
-1. What the brand/product is
-2. Key features and offerings
-3. Target audience
-4. Industry and category
-5. Unique value propositions
-
-Format as a comprehensive paragraph that will be used to generate natural questions users might ask AI assistants.`,
-    })
-
-    // Store context in Upstash
-    const contextData = {
+    // Store context in Upstash - matches BrandContext type
+    const contextData: BrandContext = {
       brand,
-      context: text,
+      context: brandContext.comprehensiveSummary,
       timestamp: Date.now(),
-    }
+    };
 
-    await redis.set(`${runId}:context`, JSON.stringify(contextData))
+    await redis.set(`${runId}:context`, JSON.stringify(contextData));
 
     return NextResponse.json({
       success: true,
       context: contextData,
-    })
+    });
   } catch (error) {
-    console.error("[v0] Error creating brand context:", error)
-    return NextResponse.json({ error: "Failed to create brand context" }, { status: 500 })
+    console.error("[v0] Error creating brand context:", error);
+    return NextResponse.json(
+      { error: "Failed to create brand context" },
+      { status: 500 }
+    );
   }
 }
